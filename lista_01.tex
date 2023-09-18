@@ -1,0 +1,36 @@
+\documentclass{article}
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{inputenc}
+\usepackage{enumitem}
+\usepackage{amsmath}
+%\usepackage[pdftex]{graphicx}
+%\usepackage{subfigure}
+
+\title{Métodos Numéricos --- Lista 01} 
+\author{André Paladini 14182390 \\ Tiago F. Oliva Costa \quad 8004408 }
+
+\begin{document}
+\maketitle
+
+\section{Questão 01}
+Classifique as EDPs abaixo quanto à ordem, a linearidade / não-linearidade, a homogeneidade e ao tipo.
+
+\begin{enumerate}[label=\Alph*]
+\item this is item a
+\item another item
+\end{enumerate}
+
+\section{Questão 02}
+Qual a diferença entre as condições de contorno de Dirichlet, Neumann e Robin?
+
+A condição de contorno de Dirichlet (ou primeiro tipo) especifica valores que a variável dependente $y(x)$ toma ao longo da fronteira do domínio. Ou seja
+\[ y(a) = \alpha, \quad y(b) = \beta. \]
+
+A condição de contorno de Neumann (ou segundo tipo) especifica valores que a derivada $y'(x)$ da variável dependente  toma ao longo da fronteira do domínio. Ou seja
+\[ y'(a) = \alpha, \quad y'(b) = \beta. \]
+
+A condição de contorno de Robin (ou terceiro tipo) especifica valores que tanto a variável dependente $y(x)$, como a sua derivada $y'(x)$, tomam ao longo da fronteira do domínio. Ou seja, seja um domínio $\Omega$ e sua fronteira representada por $\partial \Omega$,
+\[ a y + b \frac{\partial y}{\partial x} =g \qquad \text{em } \quad \partial \Omega.\]
+
+\end{document}
