@@ -4,9 +4,12 @@
 \usepackage{inputenc}
 \usepackage{enumitem}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
 %\usepackage[pdftex]{graphicx}
 %\usepackage{subfigure}
 
+\newcommand{\euler}{\mathrm{e}}
 \title{Métodos Numéricos --- Lista 01} 
 \author{André Paladini  \quad 14182390 \\ Tiago F. Oliva Costa \quad 8004408 }
 
@@ -34,7 +37,29 @@ A condição de contorno de Dirichlet (ou primeiro tipo) especifica valores que 
 A condição de contorno de Neumann (ou segundo tipo) especifica valores que a derivada $y'(x)$ da variável dependente  toma ao longo da fronteira do domínio. Ou seja
 \[ y'(a) = \alpha, \quad y'(b) = \beta. \]
 
-A condição de contorno de Robin (ou terceiro tipo) especifica valores que tanto a variável dependente $y(x)$, como a sua derivada $y'(x)$, tomam ao longo da fronteira do domínio. Ou seja, seja um domínio $\Omega$ e sua fronteira representada por $\partial \Omega$,
+A condição de contorno de Robin (ou terceiro tipo) especifica valores que tanto a variável dependente $y(x)$, como a sua derivada $y'(x)$, tomam ao longo da fronteira do domínio. Ou seja, para um domínio $\Omega$ e sua fronteira representada por $\partial \Omega$, têm-se
 \[ a y + b \frac{\partial y}{\partial x} =g \qquad \text{em } \quad \partial \Omega.\]
+
+\section{Questão 03}
+
+Pede-se $\frac{\mathrm{d}J_0(x)}{\mathrm{d}x}$ em $x=3$, onde 
+\[J_\alpha(x) = \sum_{m=0}^\infty \frac{(-1)^m}{m!\, (m+\alpha)!} {\left(\frac{x}{2}\right)}^{2m+\alpha},\]
+e por sua vez
+\[J_0(x) = \sum_{m=0}^\infty \frac{(-1)^m}{m!\, m!} {\left(\frac{x}{2}\right)}^{2m}.\]
+
+Considerando que a função de Bessel converge, podemos aplicar a derivada da série infinita obtendo
+\[J_0'(x) = \sum_{m=0}^\infty \frac{(-1)^m}{m!\, (m-1)!} {\left(\frac{x}{2}\right)}^{2m-1} = J_{(-1)}(x) = -J_1(x).\]
+
+\section{Questão 04}
+Considere a função 
+\[ f(x) = \euler^x \sin(x).
+\]
+Temos, pela regra do produto, 
+\[ f'(x) = \euler^x \sin(x) + \euler^x\cos(x),
+\]
+e aplicando a regra do produto novamente
+\[ f''(x) =  2\euler^x\cos(x).
+\]
+
 
 \end{document}
