@@ -40,6 +40,20 @@ A condição de contorno de Neumann (ou segundo tipo) especifica valores que a d
 A condição de contorno de Robin (ou terceiro tipo) especifica valores que tanto a variável dependente $y(x)$, como a sua derivada $y'(x)$, tomam ao longo da fronteira do domínio. Ou seja, para um domínio $\Omega$ e sua fronteira representada por $\partial \Omega$, têm-se
 \[ a y + b \frac{\partial y}{\partial x} =g \qquad \text{em } \quad \partial \Omega.\]
 
+\section{Suplemento}
+Para as questões 03 e 04, considere como \emph{forward difference}
+\[
+	\Delta_h f(x) = f(x+h) - f(x),
+\]
+\emph{central difference}
+\[
+	\delta_h f(x) = f(x+\frac{h}{2}) - f(x - \frac{x}{2}),
+\]
+e \emph{backward difference}
+\[
+	\nabla_h f(x) = f(x) - f(x-h).
+\]
+
 \section{Questão 03}
 
 Pede-se $\frac{\mathrm{d}J_0(x)}{\mathrm{d}x}$ em $x=3$, onde 
