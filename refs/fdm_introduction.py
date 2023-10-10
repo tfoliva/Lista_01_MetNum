@@ -26,31 +26,36 @@ h = x[1] - x[0]
 
 # Assembly of matrices and vector
 A = np.diag(np.ones(N) * 2)
-A = A + np.diag(np.ones(N-1) * (-1), 1)
-A = A + np.diag(np.ones(N-1) * (-1), -1)
-b = (s * h**2.0/k) * np.ones(N)
+A = A + np.diag(np.ones(N - 1) * (-1), 1)
+A = A + np.diag(np.ones(N - 1) * (-1), -1)
+b = (s * h**2.0 / k) * np.ones(N)
 
 # Boundary conditions
 A[0, :] = 0
 A[0, 0] = 1
 b[0] = T1bar
 
-A[N-1, :] = 0
-A[N-1, N-1] = 1
-b[N-1] = T2bar
+A[N - 1, :] = 0
+A[N - 1, N - 1] = 1
+b[N - 1] = T2bar
 
 # Solving
 T = np.linalg.solve(A, b)
 
 # Reference solution
 xref = np.linspace(0, L, 200)
-Tref = -s*xref**2/(2*k) + (T2bar - T1bar) * xref / L + s * L * xref / (2 * k) + T1bar
+Tref = (
+    -s * xref**2 / (2 * k)
+    + (T2bar - T1bar) * xref / L
+    + s * L * xref / (2 * k)
+    + T1bar
+)
 
 # Plotting the solution
-plt.plot(xref, Tref, '-k', label='Reference')
-plt.plot(x, T, '--sb', label='FDM')
-plt.xlabel('x')
-plt.ylabel('Temperature [K]')
+plt.plot(xref, Tref, "-k", label="Reference")
+plt.plot(x, T, "--sb", label="FDM")
+plt.xlabel("x")
+plt.ylabel("Temperature [K]")
 plt.legend()
 plt.show()
 
@@ -74,9 +79,9 @@ h = x[1] - x[0]
 
 # Assembly of matrices and vector
 A = np.diag(np.ones(N) * 2)
-A = A + np.diag(np.ones(N-1) * (-1), 1)
-A = A + np.diag(np.ones(N-1) * (-1), -1)
-b = (s * h**2.0/k) * np.ones(N)
+A = A + np.diag(np.ones(N - 1) * (-1), 1)
+A = A + np.diag(np.ones(N - 1) * (-1), -1)
+b = (s * h**2.0 / k) * np.ones(N)
 
 # Boundary conditions
 # T(x = 0) = T1bar
@@ -85,17 +90,17 @@ A[0, 0] = 1
 b[0] = T1bar
 
 # -k * dTdx(x = L) = hc * (T(x=L) - Tinf)
-A[N-1, N-2] += -1
-A[N-1, N-1] += 2 * hc * h / k
-b[N-1] += 2 * hc * h * Tinf / k
+A[N - 1, N - 2] += -1
+A[N - 1, N - 1] += 2 * hc * h / k
+b[N - 1] += 2 * hc * h * Tinf / k
 
 # Solving
 T = np.linalg.solve(A, b)
 
 # Plotting the solution
-plt.plot(x, T, '--sb', label='FDM')
-plt.xlabel('x')
-plt.ylabel('Temperature [K]')
+plt.plot(x, T, "--sb", label="FDM")
+plt.xlabel("x")
+plt.ylabel("Temperature [K]")
 plt.legend()
 plt.show()
 
@@ -119,27 +124,27 @@ h = x[1] - x[0]
 
 # Assembly of matrices and vector
 A = np.diag(np.ones(N) * 2)
-A = A + np.diag(np.ones(N-1) * (-1), 1)
-A = A + np.diag(np.ones(N-1) * (-1), -1)
-s = lambda x: s0 * np.exp(-x**2 / sigma)
-b = s(x) * h**2.0/k
+A = A + np.diag(np.ones(N - 1) * (-1), 1)
+A = A + np.diag(np.ones(N - 1) * (-1), -1)
+s = lambda x: s0 * np.exp(-(x**2) / sigma)
+b = s(x) * h**2.0 / k
 
 # Boundary conditions
 # q(x = 0) = 0 - Adiabatic
 A[0, 1] += -1
 
 # -k * dTdx(x = L) = hc * (T(x=L) - Tinf)
-A[N-1, N-2] += -1
-A[N-1, N-1] += 2 * hc * h / k
-b[N-1] += 2 * hc * h * Tinf / k
+A[N - 1, N - 2] += -1
+A[N - 1, N - 1] += 2 * hc * h / k
+b[N - 1] += 2 * hc * h * Tinf / k
 
 # Solving
 T = np.linalg.solve(A, b)
 
 # Plotting the solution
-plt.plot(x, T, '--sb', label='FDM')
-plt.xlabel('x')
-plt.ylabel('Temperature [K]')
+plt.plot(x, T, "--sb", label="FDM")
+plt.xlabel("x")
+plt.ylabel("Temperature [K]")
 plt.legend()
 plt.show()
 
@@ -172,7 +177,7 @@ region_R = np.arange(Nx - 1, Nx * Ny, Nx)
 region_T = np.arange(Nx * (Ny - 1), Nx * Ny)
 region_L = np.arange(0, Nx * (Ny - 1) + 1, Nx)
 
-'''
+"""
 plt.plot(x[region_B], y[region_B], 'sb', label='Bottom')
 plt.plot(x[region_R], y[region_R], 'sr', label='Right')
 plt.plot(x[region_T], y[region_T], 'sg', label='Top')
@@ -182,7 +187,7 @@ plt.legend()
 for i, (xi, yi) in enumerate(zip(x, y)):
     plt.text(xi, yi, ' ' + str(i))
 plt.show()
-'''
+"""
 
 # Assembly of matrices and vectors
 A = np.zeros((Nx * Ny, Nx * Ny))
@@ -219,5 +224,5 @@ plt.pcolor(Tmatrix)
 plt.colorbar()
 
 # Matrix sparsity
-f = np.sum(np.abs(A) > np.finfo(float).eps) / (Nx * Ny)**2
+f = np.sum(np.abs(A) > np.finfo(float).eps) / (Nx * Ny) ** 2
 print(f)
