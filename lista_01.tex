@@ -6,6 +6,9 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
+\usepackage{siunitx}
+\usepackage{listings}
+\sisetup{output-exponent-marker=\ensuremath{\mathrm{e}}}
 %\usepackage[pdftex]{graphicx}
 %\usepackage{subfigure}
 
@@ -41,18 +44,53 @@ A condição de contorno de Robin (ou terceiro tipo) especifica valores que tant
 \[ a y + b \frac{\partial y}{\partial x} =g \qquad \text{em } \quad \partial \Omega.\]
 
 \section{Suplemento}
-Para as questões 03 e 04, considere como \emph{forward difference}
+Para as questões 03 e 04, considere como\\
+\emph{forward difference}
 \[
-	\Delta_h f(x) = f(x+h) - f(x),
+	D_+ f(x) = f(x+h) - f(x),
 \]
 \emph{central difference}
 \[
-	\delta_h f(x) = f(x+\frac{h}{2}) - f(x - \frac{x}{2}),
+	D_0 f(x) = f(x+\frac{h}{2}) - f(x - \frac{x}{2}),
 \]
 e \emph{backward difference}
 \[
-	\nabla_h f(x) = f(x) - f(x-h).
+	D_- f(x) = f(x) - f(x-h).
 \]
+
+A metodologia exposta na Seção 1.5 de LeVeque\cite{leveque}, é adotada para calcular os coeficientes gerais para diferenças finitas
+\begin{equation*}
+\frac{1}{(i-1)!}\sum_{j=1}^n c_j(x_j-\bar{x})^{(i-1)}\begin{cases}
+			1 &\text{se $i-1 = k$} \\
+                        0 &\text{caso contrário}\
+                    \end{cases}
+\end{equation*}
+implementada segundo o seguinte excerto de código em Python
+\begin{lstlisting}
+"""
+Find finite difference coefficients
+
+k    - kth derivative order
+xbar - target point to approximate around
+x    - vector of N stencil points
+"""
+def fdcoeffV(k, xbar, x):
+    if isinstance(x, list):
+        x = np.array(x)
+
+    n = len(x)
+    A = np.ones((n, n))
+    xrow = np.transpose(x - xbar)  # displacements as a row vector.
+
+    for i in range(1, n+1):
+        A[i-1, :] = np.divide(np.power(xrow, (i - 1)), math.factorial(i - 1))
+
+    b = np.zeros((n, 1))  # b is right hand side,
+    b[k] = 1  # so k’th derivative term remains
+    c = np.linalg.solve(A, b)  # solve system for coefficients
+    return np.transpose(c)  # row vector
+
+\end{lstlisting}
 
 \section{Questão 03}
 
@@ -64,13 +102,23 @@ e por sua vez
 Considerando que a função de Bessel converge, podemos aplicar a derivada da série infinita obtendo
 \[J_0'(x) = \sum_{m=0}^\infty \frac{(-1)^m}{m!\, (m-1)!} {\left(\frac{x}{2}\right)}^{2m-1} = J_{(-1)}(x) = -J_1(x).\]
 
-Dessa forma temos 
+Dessa forma temos a solução exata
+\[
+ f'(x) = -0.339059
+ \]
+ e as aproximações
 (a) Backward com 2 pontos
+\[D_{-2} = -0.3836, \quad error = \num{4.46E-02} \]
 (b) Backward com 3 pontos
+\[D_{-3} = -0.3439, \quad error = \num{4.89E-02} \]
 (c) Forward com 2 pontos
+\[D_{+2} = -0.2908, \quad error = \num{-4.83E-02} \]
 (d) Forward com 3 pontos
+\[D_{+3} = -0.3414, \quad error = \num{2.38E-03} \]
 (e) Central com 2 pontos
+\[D_{0, 2} = -0.3372, \quad error = \num{-1.84E-03} \]
 (f) Central com 4 pontos
+\[D_{0, 4} = -0.3390, \quad error = \num{-1.53E-05} \]
 
 \section{Questão 04}
 Considere a função 
@@ -84,7 +132,12 @@ e aplicando a regra do produto novamente
 \]
 
 (i) Central com 2 pontos
+
 (ii) Central com 4 pontos
 
-
+\begin{thebibliography}{9}
+\bibitem{leveque}
+Randall J. LeVeque (2007) \emph{Finite Difference Methods for Ordinary and Partial Differential Equations:
+Steady-State and Time-Dependent Problems}, Society for Industrial and Applied Mathematics 
+\end{thebibliography}
 \end{document}
