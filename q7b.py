@@ -130,26 +130,31 @@ plt.figure()
 plt.contourf(xg, yg, Tmatrix[0, :, :], 20, cmap="hot")
 plt.colorbar()
 plt.title("t = 0")
+plt.savefig("figs/q7b_heatmap_t0.png", dpi=300)
 
 plt.figure()
 plt.contourf(xg, yg, Tmatrix[250, :, :], 20, cmap="hot")
 plt.colorbar()
 plt.title("t = 25")
+plt.savefig("figs/q7b_heatmap_t25.png", dpi=300)
 
 plt.figure()
 plt.contourf(xg, yg, Tmatrix[500, :, :], 20, cmap="hot")
 plt.colorbar()
 plt.title("t = 50")
+plt.savefig("figs/q7b_heatmap_t50.png", dpi=300)
 
 plt.figure()
 plt.contourf(xg, yg, Tmatrix[750, :, :], 20, cmap="hot")
 plt.colorbar()
 plt.title("t = 75")
+plt.savefig("figs/q7b_heatmap_t75.png", dpi=300)
 
 plt.figure()
 plt.contourf(xg, yg, Tmatrix[1000, :, :], 20, cmap="hot")
 plt.colorbar()
 plt.title("t = 100")
+plt.savefig("figs/q7b_heatmap_t100.png", dpi=300)
 
 # Plotting the solution
 xplot = np.linspace(Lix, Lfx, Nx)
@@ -171,4 +176,4 @@ for k, tk in enumerate(t):
 plt.title("Temperature profile (y=0)")
 plt.xlabel("x")
 plt.ylabel("Temperature")
-plt.show()
+plt.savefig("figs/q7b_temperature_profile.png", dpi=300)
