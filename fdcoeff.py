@@ -7,8 +7,7 @@ Find finite difference coefficients
 
 k    - kth derivative order
 xbar - target point to approximate around
-x    - vector of N stencil points, in descending order, e.g.
-        [x, x-h, x-2h]
+x    - vector of N stencil points
 """
 def fdcoeffV(k, xbar, x):
     if isinstance(x, list):

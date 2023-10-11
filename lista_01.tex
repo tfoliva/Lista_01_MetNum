@@ -8,6 +8,9 @@
 \usepackage{amsfonts}
 \usepackage{siunitx}
 \usepackage{listings}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 \sisetup{output-exponent-marker=\ensuremath{\mathrm{e}}}
 %\usepackage[pdftex]{graphicx}
 %\usepackage{subfigure}
@@ -59,12 +62,12 @@ e \emph{backward difference}
 \]
 
 A metodologia exposta na Seção 1.5 de LeVeque\cite{leveque}, é adotada para calcular os coeficientes gerais para diferenças finitas
-\begin{equation*}
+\begin{equation}\label{eq:leveque_coeffs}
 \frac{1}{(i-1)!}\sum_{j=1}^n c_j(x_j-\bar{x})^{(i-1)}\begin{cases}
 			1 &\text{se $i-1 = k$} \\
                         0 &\text{caso contrário}\
                     \end{cases}
-\end{equation*}
+\end{equation}
 implementada segundo o seguinte excerto de código em Python
 \begin{lstlisting}
 """
@@ -80,14 +83,14 @@ def fdcoeffV(k, xbar, x):
 
     n = len(x)
     A = np.ones((n, n))
-    xrow = np.transpose(x - xbar)  # displacements as a row vector.
+    xrow = np.transpose(x - xbar)  # displacements
 
     for i in range(1, n+1):
         A[i-1, :] = np.divide(np.power(xrow, (i - 1)), math.factorial(i - 1))
 
     b = np.zeros((n, 1))  # b is right hand side,
     b[k] = 1  # so k’th derivative term remains
-    c = np.linalg.solve(A, b)  # solve system for coefficients
+    c = np.linalg.solve(A, b)  # solve for coefficients
     return np.transpose(c)  # row vector
 
 \end{lstlisting}
@@ -106,7 +109,7 @@ Dessa forma temos a solução exata
 \[
  f'(x) = -0.339059
  \]
- e as aproximações
+ e as aproximações\\
 (a) Backward com 2 pontos
 \[D_{-2} = -0.3836, \quad error = \num{4.46E-02} \]
 (b) Backward com 3 pontos
@@ -131,9 +134,29 @@ e aplicando a regra do produto novamente
 \[ f''(x) =  2\euler^x\cos(x).
 \]
 
-(i) Central com 2 pontos
+\begin{figure}[h]
+\centering
+  \includegraphics[width=.8\textwidth]{q4.png}
+  \captionof{figure}{Aproximação para 1a e 2a derivada.}
+  \label{fig:q4}
+\end{figure}
+Considerando, por exemplo, $h=\Delta x = 1$ e
+utilizando a aproximação obtida na Eq.\eqref{eq:leveque_coeffs} para $f'(x=2)$
+e $f''(x=2)$, obtemos os seguintes valores para os casos solicitados
 
-(ii) Central com 4 pontos
+(i) Central com 2 e 3 pontos
+obtemos os coeficientes 
+
+
+(ii) Central com 4 e 5 pontos
+
+caso desejemos plotar a dependência do erro de aproximação com relação ao passo dediscretização $h$, vide Fig.~\ref{fig:q4_error}, percebemos que as aproximações com mais pontos, 3 pontos para a primeira derivada e 5 pontos para a segunda, resultam em um erro menor independente do valor de $h$. Além disso, percebe-se que o valor de $h$ influencia positivamente o erro, com menores valores de $h$ resultando em erros menores, efeito observado independente do número de pontos.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\textwidth]{q4_error.png}
+  \captionof{figure}{Evolução do erro de aproximação com variação de $h$.}
+  \label{fig:q4_error}
+\end{figure}
 
 \begin{thebibliography}{9}
 \bibitem{leveque}
