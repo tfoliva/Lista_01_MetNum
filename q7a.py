@@ -2,11 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
 
+
 class Edge(Enum):
     TOP = 1
     BOTTOM = 2
     LEFT = 3
     RIGHT = 4
+
 
 class Vertex(Enum):
     TOP_LEFT = 1
@@ -14,10 +16,12 @@ class Vertex(Enum):
     BOTTOM_LEFT = 3
     BOTTOM_RIGHT = 4
 
+
 class Region(Enum):
     EDGE = 1
     VERTEX = 2
     INSIDE = 3
+
 
 ## Input data
 # Geometry and material properties
@@ -56,36 +60,29 @@ x = xg.flatten()
 y = yg.flatten()
 T0 = T0.flatten()
 
-# print(xg)
-# print(yg)
-# print(x)
-# print(y)
-
-
 # regions
 region_B = np.arange(0, Nx, 1)
 region_R = np.arange(Nx - 1, Nx * Ny, Nx)
 region_T = np.arange(Nx * (Ny - 1), Nx * Ny, 1)
 region_L = np.arange(0, Nx * (Ny - 1) + 1, Nx)
 
+
 def check_region(i):
-
-    region = Region.INSIDE
-
     in_edge_LEFT = i in set(region_L)
     in_edge_RIGHT = i in set(region_R)
     in_edge_BOTTOM = i in set(region_B)
     in_edge_TOP = i in set(region_T)
     in_edge = in_edge_LEFT or in_edge_RIGHT or in_edge_BOTTOM or in_edge_TOP
 
-    if in_edge:
-        in_vertex_LB =in_edge_LEFT and in_edge_BOTTOM
-        in_vertex_RB =in_edge_RIGHT and in_edge_BOTTOM
-        in_vertex_LT =in_edge_LEFT and in_edge_TOP
-        in_vertex_RT =in_edge_RIGHT and in_edge_TOP
+    region = Region.INSIDE
+    if in_edge:  # if it is not in at least one edge, it is inside
+        in_vertex_LB = in_edge_LEFT and in_edge_BOTTOM
+        in_vertex_RB = in_edge_RIGHT and in_edge_BOTTOM
+        in_vertex_LT = in_edge_LEFT and in_edge_TOP
+        in_vertex_RT = in_edge_RIGHT and in_edge_TOP
         in_vertex = in_vertex_LB or in_vertex_RB or in_vertex_LT or in_vertex_RT
 
-        if in_vertex:
+        if in_vertex:  # it is in two edges simultaneously
             if in_vertex_LB:
                 region = Vertex.BOTTOM_LEFT
             elif in_vertex_LT:
@@ -93,8 +90,8 @@ def check_region(i):
             elif in_vertex_RB:
                 region = Vertex.BOTTOM_RIGHT
             elif in_vertex_RT:
-                region = Vertex.BOTTOM_LEFT
-        else: # only in one edge
+                region = Vertex.TOP_RIGHT
+        else:  # only in one edge
             if in_edge_TOP:
                 region = Edge.TOP
             elif in_edge_BOTTOM:
@@ -106,8 +103,9 @@ def check_region(i):
 
     return region
 
-def vertices(i,k, T, region):
-    if region  == Vertex.BOTTOM_LEFT:
+
+def vertices(i, k, T, region):
+    if region == Vertex.BOTTOM_LEFT:
         T[i, k] = (
             beta1 * (2 * T[i + 1, k - 1] - 2 * T[i, k - 1])
             + beta2 * (2 * T[i + Nx, k - 1] - 2 * T[i, k - 1])
@@ -132,7 +130,8 @@ def vertices(i,k, T, region):
             + T[i, k - 1]
         )
 
-def edges(i,k, T, region):
+
+def edges(i, k, T, region):
     # Edges without vertices
     if region == Edge.LEFT:
         T[i, k] = (
@@ -158,6 +157,7 @@ def edges(i,k, T, region):
             + beta2 * (2 * T[i - Nx, k - 1] - 2 * T[i, k - 1])
             + T[i, k - 1]
         )
+
 
 T = np.zeros((Nx * Ny, Nt))
 for k, tk in enumerate(t):
