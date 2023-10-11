@@ -1,5 +1,27 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from enum import Enum
+
+
+class Edge(Enum):
+    TOP = 1
+    BOTTOM = 2
+    LEFT = 3
+    RIGHT = 4
+
+
+class Vertex(Enum):
+    TOP_LEFT = 1
+    TOP_RIGHT = 2
+    BOTTOM_LEFT = 3
+    BOTTOM_RIGHT = 4
+
+
+class Region(Enum):
+    EDGE = 1
+    VERTEX = 2
+    INSIDE = 3
+
 
 ## Input data
 # Geometry and material properties
@@ -38,89 +60,124 @@ x = xg.flatten()
 y = yg.flatten()
 T0 = T0.flatten()
 
-# print(xg)
-# print(yg)
-# print(x)
-# print(y)
-
-
 # regions
 region_B = np.arange(0, Nx, 1)
 region_R = np.arange(Nx - 1, Nx * Ny, Nx)
 region_T = np.arange(Nx * (Ny - 1), Nx * Ny, 1)
 region_L = np.arange(0, Nx * (Ny - 1) + 1, Nx)
 
+
+def check_region(i):
+    in_edge_LEFT = i in set(region_L)
+    in_edge_RIGHT = i in set(region_R)
+    in_edge_BOTTOM = i in set(region_B)
+    in_edge_TOP = i in set(region_T)
+    in_edge = in_edge_LEFT or in_edge_RIGHT or in_edge_BOTTOM or in_edge_TOP
+
+    region = Region.INSIDE
+    if in_edge:  # if it is not in at least one edge, it is inside
+        in_vertex_LB = in_edge_LEFT and in_edge_BOTTOM
+        in_vertex_RB = in_edge_RIGHT and in_edge_BOTTOM
+        in_vertex_LT = in_edge_LEFT and in_edge_TOP
+        in_vertex_RT = in_edge_RIGHT and in_edge_TOP
+        in_vertex = in_vertex_LB or in_vertex_RB or in_vertex_LT or in_vertex_RT
+
+        if in_vertex:  # it is in two edges simultaneously
+            if in_vertex_LB:
+                region = Vertex.BOTTOM_LEFT
+            elif in_vertex_LT:
+                region = Vertex.TOP_LEFT
+            elif in_vertex_RB:
+                region = Vertex.BOTTOM_RIGHT
+            elif in_vertex_RT:
+                region = Vertex.TOP_RIGHT
+        else:  # only in one edge
+            if in_edge_TOP:
+                region = Edge.TOP
+            elif in_edge_BOTTOM:
+                region = Edge.BOTTOM
+            elif in_edge_RIGHT:
+                region = Edge.RIGHT
+            elif in_edge_LEFT:
+                region = Edge.LEFT
+
+    return region
+
+
+def vertices(i, k, T, region):
+    if region == Vertex.BOTTOM_LEFT:
+        T[i, k] = (
+            beta1 * (2 * T[i + 1, k - 1] - 2 * T[i, k - 1])
+            + beta2 * (2 * T[i + Nx, k - 1] - 2 * T[i, k - 1])
+            + T[i, k - 1]
+        )
+    elif region == Vertex.TOP_LEFT:
+        T[i, k] = (
+            beta1 * (2 * T[i + 1, k - 1] - 2 * T[i, k - 1])
+            + beta2 * (2 * T[i - Nx, k - 1] - 2 * T[i, k - 1])
+            + T[i, k - 1]
+        )
+    elif region == Vertex.BOTTOM_RIGHT:
+        T[i, k] = (
+            beta1 * (2 * T[i - 1, k - 1] - 2 * T[i, k - 1])
+            + beta2 * (2 * T[i + Nx, k - 1] - 2 * T[i, k - 1])
+            + T[i, k - 1]
+        )
+    elif region == Vertex.TOP_RIGHT:
+        T[i, k] = (
+            beta1 * (2 * T[i - 1, k - 1] - 2 * T[i, k - 1])
+            + beta2 * (2 * T[i - Nx, k - 1] - 2 * T[i, k - 1])
+            + T[i, k - 1]
+        )
+
+
+def edges(i, k, T, region):
+    # Edges without vertices
+    if region == Edge.LEFT:
+        T[i, k] = (
+            beta1 * (2 * T[i + 1, k - 1] - 2 * T[i, k - 1])
+            + beta2 * (T[i - Nx, k - 1] - 2 * T[i, k - 1] + T[i + Nx, k - 1])
+            + T[i, k - 1]
+        )
+    elif region == Edge.RIGHT:
+        T[i, k] = (
+            beta1 * (2 * T[i - 1, k - 1] - 2 * T[i, k - 1])
+            + beta2 * (T[i - Nx, k - 1] - 2 * T[i, k - 1] + T[i + Nx, k - 1])
+            + T[i, k - 1]
+        )
+    elif region == Edge.BOTTOM:
+        T[i, k] = (
+            beta1 * (T[i - 1, k - 1] - 2 * T[i, k - 1] + T[i + 1, k - 1])
+            + beta2 * (2 * T[i + Nx, k - 1] - 2 * T[i, k - 1])
+            + T[i, k - 1]
+        )
+    elif region == Edge.TOP:
+        T[i, k] = (
+            beta1 * (T[i - 1, k - 1] - 2 * T[i, k - 1] + T[i + 1, k - 1])
+            + beta2 * (2 * T[i - Nx, k - 1] - 2 * T[i, k - 1])
+            + T[i, k - 1]
+        )
+
+
 T = np.zeros((Nx * Ny, Nt))
 for k, tk in enumerate(t):
-    for i, xi in enumerate(x):
-        if tk == 0:
+    if tk == 0:
+        for i, xi in enumerate(x):
             T[i, k] = T0[i]
-        else:
-            # Vertices
-            if i in (set(region_L) & set(region_B)):
-                T[i, k] = (
-                    beta1 * (2 * T[i + 1, k - 1] - 2 * T[i, k - 1])
-                    + beta2 * (2 * T[i + Nx, k - 1] - 2 * T[i, k - 1])
-                    + T[i, k - 1]
-                )
-            elif i in (set(region_L) & set(region_T)):
-                T[i, k] = (
-                    beta1 * (2 * T[i + 1, k - 1] - 2 * T[i, k - 1])
-                    + beta2 * (2 * T[i - Nx, k - 1] - 2 * T[i, k - 1])
-                    + T[i, k - 1]
-                )
-            elif i in (set(region_R) & set(region_B)):
-                T[i, k] = (
-                    beta1 * (2 * T[i - 1, k - 1] - 2 * T[i, k - 1])
-                    + beta2 * (2 * T[i + Nx, k - 1] - 2 * T[i, k - 1])
-                    + T[i, k - 1]
-                )
-            elif i in (set(region_R) & set(region_T)):
-                T[i, k] = (
-                    beta1 * (2 * T[i - 1, k - 1] - 2 * T[i, k - 1])
-                    + beta2 * (2 * T[i - Nx, k - 1] - 2 * T[i, k - 1])
-                    + T[i, k - 1]
-                )
-            # Edges without vertices
-            elif i in set(region_L) - (set(region_L) & set(region_B)) - (
-                set(region_L) & set(region_T)
-            ):
-                T[i, k] = (
-                    beta1 * (2 * T[i + 1, k - 1] - 2 * T[i, k - 1])
-                    + beta2 * (T[i - Nx, k - 1] - 2 * T[i, k - 1] + T[i + Nx, k - 1])
-                    + T[i, k - 1]
-                )
-            elif i in set(region_R) - (set(region_R) & set(region_B)) - (
-                set(region_R) & set(region_T)
-            ):
-                T[i, k] = (
-                    beta1 * (2 * T[i - 1, k - 1] - 2 * T[i, k - 1])
-                    + beta2 * (T[i - Nx, k - 1] - 2 * T[i, k - 1] + T[i + Nx, k - 1])
-                    + T[i, k - 1]
-                )
-            elif i in set(region_B) - (set(region_B) & set(region_L)) - (
-                set(region_B) & set(region_R)
-            ):
-                T[i, k] = (
-                    beta1 * (T[i - 1, k - 1] - 2 * T[i, k - 1] + T[i + 1, k - 1])
-                    + beta2 * (2 * T[i + Nx, k - 1] - 2 * T[i, k - 1])
-                    + T[i, k - 1]
-                )
-            elif i in set(region_T) - (set(region_T) & set(region_L)) - (
-                set(region_T) & set(region_R)
-            ):
-                T[i, k] = (
-                    beta1 * (T[i - 1, k - 1] - 2 * T[i, k - 1] + T[i + 1, k - 1])
-                    + beta2 * (2 * T[i - Nx, k - 1] - 2 * T[i, k - 1])
-                    + T[i, k - 1]
-                )
-            # Other positions
-            else:
+    else:
+        for i, xi in enumerate(x):
+            region = check_region(i)
+
+            if region == Region.INSIDE:
                 T[i, k] = (
                     beta1 * (T[i - 1, k - 1] - 2 * T[i, k - 1] + T[i + 1, k - 1])
                     + beta2 * (T[i - Nx, k - 1] - 2 * T[i, k - 1] + T[i + Nx, k - 1])
                     + T[i, k - 1]
                 )
+            elif region in Vertex:
+                vertices(i, k, T, region)
+            elif region in Edge:
+                edges(i, k, T, region)
 
 Tmatrix = np.zeros((Nt, Ny, Nx))
 for k in range(Nt):
