@@ -107,8 +107,6 @@ for i, xi in enumerate(x):
         A[i, i + 1] = -beta1
         A[i, i + Nx] = -beta2
 
-Ainv = np.linalg.inv(A)
-
 # print(A)
 
 T = np.zeros((Nx * Ny, Nt))
@@ -119,7 +117,7 @@ for k, tk in enumerate(t):
         T[:, k] = T0
     else:
         b = list(T[:, k - 1])
-        T[:, k] = Ainv @ b
+        T[:, k] = np.linalg.solve(A, b)
 
 
 Tmatrix = np.zeros((Nt, Ny, Nx))
