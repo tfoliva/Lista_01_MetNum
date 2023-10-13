@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from fdcoeff import fdcoeffV, approx_derivative, u_approx
+import time
+
+start = time.time()
 
 
 # Questão 04
@@ -71,7 +74,7 @@ plt.plot(
 
 plt.title(f"f(x) = exp(x)sin(x), h = {h}")
 plt.legend()
-plt.savefig("q4.png", dpi=300)
+plt.savefig("figs/q4.png", dpi=300)
 
 # sensibility to h
 h_array = np.linspace(0.1, 1)
@@ -98,7 +101,7 @@ for i, h in enumerate(h_array):
     e1_4[i] = (d1_4[i] - f_1p(xbar)) ** 2
     e2_3[i] = (d2_3[i] - f_2p(xbar)) ** 2
     e2_5[i] = (d2_5[i] - f_2p(xbar)) ** 2
-
+end = time.time()
 
 plt.figure()
 plt.title("Finite Differences approximations")
@@ -117,5 +120,7 @@ plt.loglog(h_array, e2_5, "--", label="e2_5", color=scd_der[0].get_color())
 plt.xlabel("h")
 plt.legend()
 plt.grid(which="both", color="gray", linestyle="--", linewidth=0.5)
-plt.savefig("q4_error.png", dpi=300)
+plt.savefig("figs/q4_error.png", dpi=300)
 plt.show()
+
+print(f"Q4 took {end-start} seconds")
