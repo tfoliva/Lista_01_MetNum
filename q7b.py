@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import time
+
+
 ## Input data
 # Geometry and material properties
 Lix = -1
@@ -49,6 +52,7 @@ region_R = np.arange(Nx - 1, Nx * Ny, Nx)
 region_T = np.arange(Nx * (Ny - 1), Nx * Ny, 1)
 region_L = np.arange(0, Nx * (Ny - 1) + 1, Nx)
 
+start = time.time()
 # Matrix A assembly
 A = np.zeros((Nx * Ny, Nx * Ny))
 
@@ -123,6 +127,10 @@ for k, tk in enumerate(t):
 Tmatrix = np.zeros((Nt, Ny, Nx))
 for k in range(Nt):
     Tmatrix[k, :, :] = np.reshape(T[:, k], (Ny, Nx))
+
+end = time.time()
+
+print(f"Q7b took {end-start} seconds")
 
 plt.figure()
 plt.contourf(xg, yg, Tmatrix[0, :, :], 20, cmap="hot")

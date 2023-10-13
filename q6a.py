@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import time
+
+start = time.time()
+
 ## Input data
 # Geometry and material properties
 L = 1
@@ -45,7 +49,9 @@ for k, tk in enumerate(t):
                 )
 
 
-print(T)
+end = time.time()
+
+print(f"Q6a took {end-start} seconds")
 
 plt.figure()
 plt.pcolor(x, t, T.T, cmap="hot")

@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
 
+import time
+
 
 class Edge(Enum):
     TOP = 1
@@ -159,6 +161,7 @@ def edges(i, k, T, region):
         )
 
 
+start = time.time()
 T = np.zeros((Nx * Ny, Nt))
 for k, tk in enumerate(t):
     if tk == 0:
@@ -183,6 +186,9 @@ Tmatrix = np.zeros((Nt, Ny, Nx))
 for k in range(Nt):
     Tmatrix[k, :, :] = np.reshape(T[:, k], (Ny, Nx))
 
+end = time.time()
+
+print(f"Q7a took {end-start} seconds")
 
 plt.figure()
 plt.contourf(xg, yg, Tmatrix[0, :, :], 20, cmap="hot")

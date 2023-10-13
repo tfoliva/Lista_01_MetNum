@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import time
+
+start = time.time()
+
 ## Input data
 # Geometry and material properties
 L = 1
@@ -39,8 +43,6 @@ for i, xi in enumerate(x):
         A[i, i + 1] = -beta
         A[i, i] = 2 * beta + 1
 
-Ainv = np.linalg.inv(A)
-
 # print(A)
 
 b = np.zeros(N)
@@ -52,10 +54,12 @@ for k, tk in enumerate(t):
         b = list(T[:, k - 1])
         if t[k] <= 10:
             b[0] = b[0] + 2 * beta * dx * q
-            T[:, k] = Ainv @ b
+            T[:, k] = np.linalg.solve(A, b)
         else:
-            T[:, k] = Ainv @ b
+            T[:, k] = np.linalg.solve(A, b)
+end = time.time()
 
+print(f"Q6b took {end-start} seconds")
 
 # print(T)
 

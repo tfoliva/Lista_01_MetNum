@@ -1,5 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import time
+
+start = time.time()
 
 ## Input data
 # Geometry and material properties
@@ -111,8 +114,6 @@ for i, xi in enumerate(x):
         A[i, i + 1] = beta1
         A[i, i + Nx] = beta2
 
-Ainv = np.linalg.inv(A)
-
 # print(A)
 
 # Vector b assembly
@@ -154,20 +155,13 @@ for i, xi in enumerate(x):
 
 # Solve the system
 T = np.zeros((Nx * Ny, 1))
-T = Ainv @ b
+T = np.linalg.solve(A, b)
 
 # print(T)
 
 Tmatrix = np.reshape(T, (Ny, Nx))
 
 # print(Tmatrix)
-
-plt.figure()
-plt.contourf(xg, yg, Tmatrix, 30, cmap="hot")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.colorbar()
-plt.savefig("figs/q5_colorbar.png", dpi=300)
 
 # Heat flux on the boundaries
 
@@ -189,3 +183,15 @@ for i, xi in enumerate(x):
 
 print(q)
 print(q[0] + q[1] + q[2] + q[3])
+end = time.time()
+
+print(f"Q5 took {end-start} seconds")
+
+
+plt.figure()
+plt.contourf(xg, yg, Tmatrix, 30, cmap="hot")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.colorbar()
+plt.savefig("figs/q5_colorbar.png", dpi=300)
+
