@@ -11,6 +11,7 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
 \sisetup{output-exponent-marker=\ensuremath{\mathrm{e}}}
 %\usepackage[pdftex]{graphicx}
 %\usepackage{subfigure}
@@ -69,6 +70,7 @@ A metodologia exposta na Seção 1.5 de LeVeque\cite{leveque}, é adotada para c
                     \end{cases}
 \end{equation}
 implementada segundo o seguinte excerto de código em Python
+
 \begin{lstlisting}
 """
 Find finite difference coefficients
@@ -86,7 +88,8 @@ def fdcoeffV(k, xbar, x):
     xrow = np.transpose(x - xbar)  # displacements
 
     for i in range(1, n+1):
-        A[i-1, :] = np.divide(np.power(xrow, (i - 1)), math.factorial(i - 1))
+        A[i-1, :] = np.divide(np.power(xrow, (i - 1)),
+                              math.factorial(i - 1))
 
     b = np.zeros((n, 1))  # b is right hand side,
     b[k] = 1  # so k’th derivative term remains
@@ -168,8 +171,118 @@ Q5 took 12.47940993309021 seconds
 \end{figure}
 
 \section{Questão 6}
+
+\begin{lstlisting}
+## Input data
+# Geometry and material properties
+L = 1
+lamb = 0.01
+# Boudary conditions
+q = 1
+# Initial conditions
+T0 = 1
+# Final time
+tend = 30
+
+## Discretization
+N = 50  # spatial
+Nt = 3000  # temporal
+x = np.linspace(0, L, N)
+t = np.linspace(0, tend, Nt)
+dx = x[1] - x[0]
+dt = t[1] - t[0]
+
+beta = lamb * dt / (dx**2)
+
+T = np.zeros((N, Nt))
+for k, tk in enumerate(t):
+    if tk == 0:
+        for i, xi in enumerate(x):
+            T[i, k] = T0
+    else:
+        for i, xi in enumerate(x):
+            if np.isclose(xi, 0):
+                if t[k] <= 10:
+                    T[i, k] = T[i, k - 1] + beta * (
+                        2 * T[i + 1, k - 1] 
+                        - 2 * T[i, k - 1] + 2 * dx * q
+                    )
+                else:
+                    T[i, k] = T[i, k - 1] + beta * (
+                        2 * T[i + 1, k - 1] - 2 * T[i, k - 1]
+                    )
+            elif np.isclose(xi, L):
+                T[i, k] = T[i, k - 1] + beta * (2 * T[i - 1, k - 1]
+                - 2 * T[i, k - 1])
+            else:
+                T[i, k] = T[i, k - 1] + beta * (
+                    T[i - 1, k - 1] - 2 * T[i, k - 1] + T[i + 1, k - 1]
+                )
+\end{lstlisting}
+
+\begin{lstlisting}
+## Input data
+# Geometry and material properties
+L = 1
+lamb = 0.01
+# Boudary conditions
+q = 1
+# Initial conditions
+T0 = 1
+# Final time
+tend = 30
+
+## Discretization
+N = 50  # spatial
+Nt = 3000  # temporal
+x = np.linspace(0, L, N)
+t = np.linspace(0, tend, Nt)
+dx = x[1] - x[0]
+dt = t[1] - t[0]
+
+beta = lamb * dt / (dx**2)
+
+T = np.zeros((N, Nt))
+
+# Matrix A assembly
+A = np.zeros((N, N))
+
+for i, xi in enumerate(x):
+    if np.isclose(xi, 0):
+        A[i, i] = 2 * beta + 1
+        A[i, i + 1] = -2 * beta
+    elif np.isclose(xi, L):
+        A[i, i - 1] = -2 * beta
+        A[i, i] = 2 * beta + 1
+    else:
+        A[i, i - 1] = -beta
+        A[i, i + 1] = -beta
+        A[i, i] = 2 * beta + 1
+
+# print(A)
+
+b = np.zeros(N)
+# Solution
+for k, tk in enumerate(t):
+    if tk == 0:
+        T[:, k] = T0
+    else:
+        b = list(T[:, k - 1])
+        if t[k] <= 10:
+            b[0] = b[0] + 2 * beta * dx * q
+            T[:, k] = np.linalg.solve(A, b)
+        else:
+            T[:, k] = np.linalg.solve(A, b)
+\end{lstlisting}
+
 Q6a took 8.867920160293579 seconds
 Q6b took 0.04085826873779297 seconds
+
+Quanto à discretização adotada: 
+para as derivadas no espaço, foi usada a aproximação de derivada central de 3 pontos e para as derivadas no tempo, aproximação de dois pontos.
+
+Para aplicar as condições de contorno, foram utilizados pontos fantasma nas aproximações das derivadas espaciais, já que se tratavam de condições de contorno de Neumann.
+
 \begin{figure}[h]
 \centering
      \begin{subfigure}[b]{0.49\textwidth}
@@ -206,10 +319,27 @@ Q6b took 0.04085826873779297 seconds
 \caption{Perfis de temperature Questão 6}
 \end{figure}
 
+\begin{figure}[h]
+\centering
+     \includegraphics[width=\textwidth]{figs/chinesta_fig1.png}
+     \caption{Figura 01 de \cite{chinesta}, "
+Temperature profiles corresponding to the source term (13) at discrete times
+$t_m =m$,for $m=1,2,...,30$. The red curves correspond to the heating stagel up to $t=10$, while the blue curves for $t > 10$ illustrate the heat transfer by conduction from the
+warmest zones towards the coldest ones. (For interpretation of the references to
+    color in this figure legend, the reader is referred to the web version of the article.)"}
+    \label{fig:chinesta}
+\end{figure}
+
+
 \section{Questão 7}
 
 Q7a took 2.9745030403137207 seconds
 Q7b took 4.0168750286102295 seconds
+
+Para a questão 7, as discretizações e condições de contorno adotadas foram as mesmas da questão 6:
+para as derivadas no espaço, foi usada a aproximação de derivada central de 3 pontos e para as derivadas no tempo, aproximação de dois pontos.
+
+Para aplicar as condições de contorno, foram utilizados pontos fantasma nas aproximações das derivadas espaciais, já que se tratavam de condições de contorno de Neumann.
 \begin{figure}[h]
 \centering
      \begin{subfigure}[b]{0.49\textwidth}
@@ -309,5 +439,8 @@ Q7b took 4.0168750286102295 seconds
 \bibitem{leveque}
 Randall J. LeVeque (2007) \emph{Finite Difference Methods for Ordinary and Partial Differential Equations:
 Steady-State and Time-Dependent Problems}, Society for Industrial and Applied Mathematics 
+
+\bibitem{chinesta}
+Francisco Chinesta, Amine Ammar, Adrien Leygue, Roland Keunings. An overview of the proper generalized decomposition with applications in computational rheology. Journal of Non-Newtonian Fluid Mechanics, 2011, 166 (11), pp.578-592. hal-01061441
 \end{thebibliography}
 \end{document}
